@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "appflowy.fullname" . }}
+  name: {{ include "appflowy.fullname" . }}-admin-frontend
   labels:
     {{- include "appflowy.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - port: {{ .Values.appflowy.adminFrontend.service.port }}
+      targetPort: {{ .Values.appflowy.adminFrontend.service.targetPort }}
       protocol: TCP
       name: http
   selector:
