@@ -19,3 +19,6 @@ helm repo add appflowy https://jessebot.github.io/appflowy-helm
 # install the helm chart
 helm install appflowy appflowy/appflowy
 ```
+
+## Status
+Under development still, but happy to review pull requests and issues :)
