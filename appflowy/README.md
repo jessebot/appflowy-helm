@@ -13,7 +13,14 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | appflowy.adminFrontend.image.pullPolicy | string | `"IfNotPresent"` | image pullPolicy for the admin frontend. set to Always if using latest tag |
 | appflowy.adminFrontend.image.repository | string | `"appflowyinc/admin_frontend"` | docker repository for the admin frontend |
 | appflowy.adminFrontend.image.tag | string | `"v0.0.1"` | image tag to use for the admin frontend container ref: https://hub.docker.com/r/appflowyinc/admin_frontend/tags |
-| appflowy.adminFrontend.service | object | `{"port":8000,"targetPort":8000,"type":"ClusterIP"}` | service for the appflowy admin frontend |
+| appflowy.adminFrontend.ingress.annotations | object | `{}` |  |
+| appflowy.adminFrontend.ingress.className | string | `"nginx"` |  |
+| appflowy.adminFrontend.ingress.enabled | bool | `false` | enable ingress, access from outside the cluster, for the admin frontend |
+| appflowy.adminFrontend.ingress.hosts[0].host | string | `"chart-example.local"` |  |
+| appflowy.adminFrontend.ingress.hosts[0].paths[0].path | string | `"/"` |  |
+| appflowy.adminFrontend.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| appflowy.adminFrontend.ingress.tls | list | `[]` |  |
+| appflowy.adminFrontend.service | object | `{"port":80,"targetPort":8000,"type":"ClusterIP"}` | service for the appflowy admin frontend |
 | appflowy.environment | string | `"production"` | set environment |
 | appflowy.gotrue.adminEmail | string | `""` | set the admin email for gotrue |
 | appflowy.gotrue.adminPassword | string | `""` | set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
@@ -38,8 +45,8 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. ref: https://hub.docker.com/r/appflowyinc/appflowy_cloud/tags |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
-| ingress.className | string | `""` |  |
-| ingress.enabled | bool | `false` |  |
+| ingress.className | string | `"nginx"` |  |
+| ingress.enabled | bool | `false` | enable ingress, access from outside the cluster |
 | ingress.hosts[0].host | string | `"chart-example.local"` |  |
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
@@ -52,7 +59,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
-| service | object | `{"port":3000,"targetPort":3000,"type":"ClusterIP"}` | service for appflowy_cloudy |
+| service | object | `{"port":80,"targetPort":3000,"type":"ClusterIP"}` | service for appflowy_cloudy |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.automount | bool | `true` | Automatically mount a ServiceAccount's API credentials? |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
