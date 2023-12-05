@@ -10,7 +10,8 @@ image:
   # -- image pullPolicy, set to Always if using latest tag
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  # ref: https://hub.docker.com/r/appflowyinc/appflowy_cloud/tags
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
@@ -57,7 +58,8 @@ appflowy:
       # -- image pullPolicy for the admin frontend. set to Always if using latest tag
       pullPolicy: IfNotPresent
       # -- image tag to use for the admin frontend container
-      tag: latest
+      # ref: https://hub.docker.com/r/appflowyinc/admin_frontend/tags
+      tag: v0.0.1
     # -- service for the appflowy admin frontend
     service:
       type: ClusterIP

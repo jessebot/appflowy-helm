@@ -12,7 +12,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | appflowy.adminFrontend.enabled | bool | `true` | whether or not to deploy the admin frontend |
 | appflowy.adminFrontend.image.pullPolicy | string | `"IfNotPresent"` | image pullPolicy for the admin frontend. set to Always if using latest tag |
 | appflowy.adminFrontend.image.repository | string | `"appflowyinc/admin_frontend"` | docker repository for the admin frontend |
-| appflowy.adminFrontend.image.tag | string | `"latest"` | image tag to use for the admin frontend container |
+| appflowy.adminFrontend.image.tag | string | `"v0.0.1"` | image tag to use for the admin frontend container ref: https://hub.docker.com/r/appflowyinc/admin_frontend/tags |
 | appflowy.adminFrontend.service | object | `{"port":8000,"targetPort":8000,"type":"ClusterIP"}` | service for the appflowy admin frontend |
 | appflowy.environment | string | `"production"` | set environment |
 | appflowy.gotrue.adminEmail | string | `""` | set the admin email for gotrue |
@@ -35,7 +35,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | image pullPolicy, set to Always if using latest tag |
 | image.repository | string | `"appflowyinc/appflowy_cloud"` | image repo for the appflowy cloud image |
-| image.tag | string | `"latest"` | Overrides the image tag whose default is the chart appVersion. |
+| image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. ref: https://hub.docker.com/r/appflowyinc/appflowy_cloud/tags |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
