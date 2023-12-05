@@ -20,17 +20,6 @@ fullnameOverride: ""
 appflowy:
   # -- set environment
   environment: "production"
-  gotrue:
-    # -- set the admin email for gotrue
-    adminEmail: ""
-    # -- set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
-    adminPassword: ""
-    # -- gotrue ext URL
-    extUrl: ""
-    # -- set the JWT secret for gotrue
-    jwtSecret: ""
-    # -- use an existing secret for gotrue info
-    existingSecret: ""
   s3:
     # -- the access key ID for your S3 endpoint
     accessKeyId: ""
@@ -82,6 +71,18 @@ appflowy:
       #    hosts:
       #      - chart-example.local
 
+gotrue:
+  # -- use an existing secret for gotrue env vars
+  existingSecret: ""
+  # -- set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+  adminPassword: ""
+  # -- set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+  adminEmail: ""
+  # -- gotrue api external URL - ignored if appflowy.gotrue.existingSecret is not empty
+  externalUrl: ""
+  # -- set the JWT secret for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+  jwtSecret: ""
+  
 # -- service for appflowy_cloudy
 service:
   type: ClusterIP
