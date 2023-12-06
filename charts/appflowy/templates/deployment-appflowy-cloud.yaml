@@ -54,18 +54,20 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "appflowy.gotrue.secret" . }}
+            - secretRef:
+                name: {{ include "appflowy.s3.secret" . }}
           env:
             - name: APP_ENVIRONMENT
               value: {{ .Values.appflowy.environment }}
+            {{- if .Values.appflowy.s3.useMinio }}
             - name: APP__S3__USE_MINIO
-              value: {{ .Values.appflowy.s3.useMinio }}
+              value: "true"
+            {{- end }}
             - name: RUST_LOG
               value: {{ .Values.appflowy.rustLog }}
-          envFrom:
-            - secretRef:
-                name: {{- include "appflowy.gotrue.secret" . }}
-            - secretRef:
-                name: {{- include "appflowy.s3.secret" . }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

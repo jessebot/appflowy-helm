@@ -35,6 +35,7 @@ appflowy:
     useMinio: false
     # -- use an existing secret for s3 credentials
     existingSecret: ""
+
   # -- set the log level for rust
   rustLog: "info"
 
@@ -72,16 +73,23 @@ appflowy:
       #      - chart-example.local
 
 gotrue:
-  # -- use an existing secret for gotrue env vars
-  existingSecret: ""
-  # -- set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
-  adminPassword: ""
-  # -- set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+  # -- APP__GOTRUE__ADMIN_EMAIL - set the admin email for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
   adminEmail: ""
-  # -- gotrue api external URL - ignored if appflowy.gotrue.existingSecret is not empty
+  # -- APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+  adminPassword: ""
+  # -- APP__GOTRUE__EXT_URL - gotrue api external URL - ignored if appflowy.gotrue.existingSecret is not empty
   externalUrl: ""
-  # -- set the JWT secret for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+  # -- APP__GOTRUE__JWT_SECRET - set the JWT secret for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
   jwtSecret: ""
+  # -- use an existing kubernetes secret for gotrue env vars
+  existingSecret: ""
+  # TODO: add these in the deployment.yaml
+  # secret keys to use in existing kubernetes secret for gotrue info
+  # secretKeys:
+  #   adminEmail: "adminEmail"
+  #   adminPassword: "adminPassword"
+  #   externalUrl: "externalUrl"
+  #   jwtSecret: "jwtSecret"
   
 # -- service for appflowy_cloudy
 service:
