@@ -33,8 +33,19 @@ appflowy:
     bucket: ""
     # -- whether or not to use minio
     useMinio: false
-    # -- use an existing secret for s3 credentials
+    # -- use an existing kubernetes secret for s3 credentials
     existingSecret: ""
+    secretKeys:
+      # -- secret key in existing k8s secret for s3 accessKeyId
+      accessKeyId: "accessKeyId"
+      # -- secret key in existing k8s secret for s3 secretAccessKey
+      secretAccessKey: "secretAccessKey"
+      # -- secret key in existing k8s secret for s3 endpoint
+      endpoint: "endpoint"
+      # -- secret key in existing k8s secret for s3 region
+      region: "region"
+      # -- secret key in existing k8s secret for s3 bucket
+      bucket: "bucket"
 
   # -- set the log level for rust
   rustLog: "info"
@@ -83,13 +94,16 @@ gotrue:
   jwtSecret: ""
   # -- use an existing kubernetes secret for gotrue env vars
   existingSecret: ""
-  # TODO: add these in the deployment.yaml
   # secret keys to use in existing kubernetes secret for gotrue info
-  # secretKeys:
-  #   adminEmail: "adminEmail"
-  #   adminPassword: "adminPassword"
-  #   externalUrl: "externalUrl"
-  #   jwtSecret: "jwtSecret"
+  secretKeys:
+    # -- secret key in existing kubernetes secret for admin Email
+    adminEmail: "adminEmail"
+    # -- secret key in existing kubernetes secret for admin password
+    adminPassword: "adminPassword"
+    # -- secret key in existing kubernetes secret for external URL
+    externalUrl: "externalUrl"
+    # -- secret key in existing kubernetes secret for the jwt secret
+    jwtSecret: "jwtSecret"
   
 # -- service for appflowy_cloudy
 service:

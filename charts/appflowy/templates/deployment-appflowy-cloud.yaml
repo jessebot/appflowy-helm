@@ -54,20 +54,60 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          envFrom:
-            - secretRef:
-                name: {{ include "appflowy.gotrue.secret" . }}
-            - secretRef:
-                name: {{ include "appflowy.s3.secret" . }}
           env:
             - name: APP_ENVIRONMENT
               value: {{ .Values.appflowy.environment }}
+            - name: RUST_LOG
+              value: {{ .Values.appflowy.rustLog }}
+            - name: APP__GOTRUE__ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.secret" . }}
+                  key: {{ .Values.gotrue.secretKeys.adminEmail }}
+            - name: APP__GOTRUE__ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.secret" . }}
+                  key: {{ .Values.gotrue.secretKeys.adminPassword }}
+            - name: APP__GOTRUE__JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.secret" . }}
+                  key: {{ .Values.gotrue.secretKeys.jwtSecret }}
+            - name: APP__GOTRUE__EXT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.secret" . }}
+                  key: {{ .Values.gotrue.secretKeys.externalUrl }}
             {{- if .Values.appflowy.s3.useMinio }}
             - name: APP__S3__USE_MINIO
               value: "true"
             {{- end }}
-            - name: RUST_LOG
-              value: {{ .Values.appflowy.rustLog }}
+            - name: APP__S3__AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.accessKeyId }}
+            - name: APP__S3__AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.secretAccessKey }}
+            - name: APP__S3__AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.region }}
+            - name: APP__S3__AWS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.bucket }}
+            - name: APP__S3__MINIO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.endpoint }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

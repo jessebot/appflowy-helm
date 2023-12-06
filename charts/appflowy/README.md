@@ -22,24 +22,33 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | appflowy.adminFrontend.ingress.tls | list | `[]` |  |
 | appflowy.adminFrontend.service | object | `{"port":80,"targetPort":8000,"type":"ClusterIP"}` | service for the appflowy admin frontend |
 | appflowy.environment | string | `"production"` | set environment |
-| appflowy.gotrue.adminEmail | string | `""` | set the admin email for gotrue |
-| appflowy.gotrue.adminPassword | string | `""` | set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
-| appflowy.gotrue.existingSecret | string | `""` | use an existing secret for gotrue info |
-| appflowy.gotrue.extUrl | string | `""` | gotrue ext URL |
-| appflowy.gotrue.jwtSecret | string | `""` | set the JWT secret for gotrue |
 | appflowy.rustLog | string | `"info"` | set the log level for rust |
 | appflowy.s3.accessKeyId | string | `""` | the access key ID for your S3 endpoint |
 | appflowy.s3.bucket | string | `""` | S3 bucket for appflowy to use |
 | appflowy.s3.endpoint | string | `"http://minio:9000"` | your S3 endpoint |
-| appflowy.s3.existingSecret | string | `""` | use an existing secret for s3 credentials |
+| appflowy.s3.existingSecret | string | `""` | use an existing kubernetes secret for s3 credentials |
 | appflowy.s3.region | string | `""` | region your S3 bucket is in |
 | appflowy.s3.secretAccessKey | string | `""` | the secret access key for your S3 endpoint |
+| appflowy.s3.secretKeys.accessKeyId | string | `"accessKeyId"` | secret key in existing k8s secret for s3 accessKeyId |
+| appflowy.s3.secretKeys.bucket | string | `"bucket"` | secret key in existing k8s secret for s3 bucket |
+| appflowy.s3.secretKeys.endpoint | string | `"endpoint"` | secret key in existing k8s secret for s3 endpoint |
+| appflowy.s3.secretKeys.region | string | `"region"` | secret key in existing k8s secret for s3 region |
+| appflowy.s3.secretKeys.secretAccessKey | string | `"secretAccessKey"` | secret key in existing k8s secret for s3 secretAccessKey |
 | appflowy.s3.useMinio | bool | `false` | whether or not to use minio |
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | fullnameOverride | string | `""` |  |
+| gotrue.adminEmail | string | `""` | APP__GOTRUE__ADMIN_EMAIL - set the admin email for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
+| gotrue.adminPassword | string | `""` | APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
+| gotrue.existingSecret | string | `""` | use an existing kubernetes secret for gotrue env vars |
+| gotrue.externalUrl | string | `""` | APP__GOTRUE__EXT_URL - gotrue api external URL - ignored if appflowy.gotrue.existingSecret is not empty |
+| gotrue.jwtSecret | string | `""` | APP__GOTRUE__JWT_SECRET - set the JWT secret for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
+| gotrue.secretKeys.adminEmail | string | `"adminEmail"` | secret key in existing kubernetes secret for admin Email |
+| gotrue.secretKeys.adminPassword | string | `"adminPassword"` | secret key in existing kubernetes secret for admin password |
+| gotrue.secretKeys.externalUrl | string | `"externalUrl"` | secret key in existing kubernetes secret for external URL |
+| gotrue.secretKeys.jwtSecret | string | `"jwtSecret"` | secret key in existing kubernetes secret for the jwt secret |
 | image.pullPolicy | string | `"IfNotPresent"` | image pullPolicy, set to Always if using latest tag |
 | image.repository | string | `"appflowyinc/appflowy_cloud"` | image repo for the appflowy cloud image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. ref: https://hub.docker.com/r/appflowyinc/appflowy_cloud/tags |
