@@ -104,7 +104,6 @@ gotrue:
     externalUrl: "externalUrl"
     # -- secret key in existing kubernetes secret for the jwt secret
     jwtSecret: "jwtSecret"
-  
 # -- service for appflowy_cloudy
 service:
   type: ClusterIP
