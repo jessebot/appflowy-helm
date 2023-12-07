@@ -25,7 +25,7 @@ data:
 
     echo "Running migrations with sqlx now!"
 
-    sqlx database create --databse-url $DATABASE_URL
-    sqlx migrate run --databse-url $DATABASE_URL
+    sqlx database create --database-url $DATABASE_URL
+    sqlx migrate run --database-url $DATABASE_URL
 
     echo "Postgres has been migrated, ready to go!"
