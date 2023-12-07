@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Job
 metadata:
-  name: {{ include "appflowy.fullname" . }}-cloud-init-job
+  name: appflowy-cloud-init-job
   labels:
     {{- include "appflowy.labels" . | nindent 4 }}
   annotations:
