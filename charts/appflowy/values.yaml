@@ -83,27 +83,16 @@ appflowy:
       #    hosts:
       #      - chart-example.local
 
-gotrue:
-  # -- APP__GOTRUE__ADMIN_EMAIL - set the admin email for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
-  adminEmail: ""
-  # -- APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
-  adminPassword: ""
-  # -- APP__GOTRUE__EXT_URL - gotrue api external URL - ignored if appflowy.gotrue.existingSecret is not empty
-  externalUrl: ""
-  # -- APP__GOTRUE__JWT_SECRET - set the JWT secret for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
-  jwtSecret: ""
-  # -- use an existing kubernetes secret for gotrue env vars
-  existingSecret: ""
-  # secret keys to use in existing kubernetes secret for gotrue info
-  secretKeys:
-    # -- secret key in existing kubernetes secret for admin Email
-    adminEmail: "adminEmail"
-    # -- secret key in existing kubernetes secret for admin password
-    adminPassword: "adminPassword"
-    # -- secret key in existing kubernetes secret for external URL
-    externalUrl: "externalUrl"
-    # -- secret key in existing kubernetes secret for the jwt secret
-    jwtSecret: "jwtSecret"
+  gotrue:
+    # -- APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+    adminPassword: ""
+    # -- use an existing kubernetes secret for gotrue env vars
+    existingSecret: ""
+    # secret keys to use in existing kubernetes secret for gotrue info
+    secretKeys:
+      # -- secret key in existing kubernetes secret for admin password
+      adminPassword: "adminPassword"
+
 # -- service for appflowy_cloudy
 service:
   type: ClusterIP
@@ -170,14 +159,14 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # -- Additional volumes on the output Deployment definition.
-volumes: []
+extraVolumes: []
 # - name: foo
 #   secret:
 #     secretName: mysecret
 #     optional: false
 
 # -- Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
+extraVolumeMounts: []
 # - name: foo
 #   mountPath: "/etc/foo"
 #   readOnly: true
@@ -187,3 +176,106 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+## optional gotrue subchart
+#
+gotrue:
+  # -- enable the gotrue subchart which takes any values from https://github.com/jessebot/gotrue-helm
+  # this chart takes presidence over appflowy.gotrue values
+  enabled: false
+  # -- GOTRUE_SITE_URL - siteUrl to use for gotrue
+  siteUrl: "http://localhost:3000"
+  # -- API_EXTERNAL_URL - gotrue api external URL -- gotrue.externalUrl takes presidence over appflowy.gotrue.externalUrl
+  externalUrl: "http://0.0.0.0:9999"
+  # -- GOTRUE_API_HOST - api host
+  apiHost: "localhost"
+  # -- PORT - port to use for gotrue
+  port: "9999"
+
+  ## gotrue smtp section
+  smtp:
+    # -- gotrue.smtp.adminEmail takes presidence over appflowy.gotrue.adminEmail
+    adminEmail: ""
+    # -- use an existing kubernetes secret for SMTP credentials
+    existingSecret: ""
+    # keys inside the existing kubernetes secret
+    secretKeys:
+      # -- adminEmail secret key inside a gotrue.smtp.existingSecret
+      adminEmail: "adminEmail"
+
+  ## gotrue jwt section
+  jwt:
+    # -- set the JWT secret for gotrue - ignored if gotrue.jwt.existingSecret is not empty
+    secret: ""
+    # -- use an existing Kubernetes secret for jwt secret
+    existingSecret: ""
+    # -- key in existing kubernetes secret for the jwt secret
+    secretKey: "jwtSecret"
+
+  ## gotrue database section
+  database:
+    # -- use an existingSecret for database. must contain keys: DATABASE_URL, GOTRUE_DB_DRIVER, DB_NAMESPACE
+    existingSecret: ""
+    # -- which database backend to use for gotrue
+    # ignored if databaseUrl or existingSecret are not empty
+    driver: postgres
+    # -- database username - ignored if databaseUrl or existingSecret are not empty
+    user: "supabase_auth_admin"
+    # -- database hostname - ignored if databaseUrl or existingSecret are not empty
+    host: "postgresql.gotrue.svc.cluster.local"
+    # -- database port - ignored if databaseUrl or existingSecret are not empty
+    port: "5432"
+    # -- name of the database on the databsae hostname
+    # ignored if databaseUrl or existingSecret are not empty
+    database: "gotrue"
+    # -- password to connect to database with
+    # ignored if databaseUrl or existingSecret are not empty or if sslmode is not empty
+    password: ""
+    # -- mode for connecting to database with TLS e.g. verify-full
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslMode: ""
+    # -- path to root TLS cert for connecting to the database with TLS
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslRootCert: ""
+    # -- path to TLS cert for connecting to the database with TLS
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslCert: ""
+    # -- path to TLS key for connecting to the database with TLS
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslKey: ""
+    # -- database namespace - sets the schema name
+    namespace: "auth"
+    # -- database connection url
+    # e.g. postgres://supabase_auth_admin:root@postgresql.gotrue.svc.cluster.local:5432/gotrue
+    # only required if you don't pass in driver, user, host, port, and
+    # password or sslmode/sslcert/sslrootcert/sslkey.
+    databaseUrl: ""
+
+
+## PostgreSQL subchart configuration - provided by bitnami
+## for more options see https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+##
+postgresql:
+  enabled: false
+  fullnameOverride: appflowy-postgres
+  global:
+    postgresql:
+      # -- global.postgresql.auth overrides postgresql.auth
+      auth:
+        username: 
+        password: changeme
+        database: appflowy
+        postgresPassword: changeme
+        # -- Name of existing secret to use for PostgreSQL credentials.
+        # auth.postgresPassword, auth.password, and auth.replicationPassword will be ignored and picked up from this secret.
+        # secret might also contains the key ldap-password if LDAP is enabled.
+        # ldap.bind_password will be ignored and picked from this secret in this case.
+        existingSecret: ""
+        # -- Names of keys in existing secret to use for PostgreSQL credentials
+        secretKeys:
+          adminPasswordKey: ""
+          userPasswordKey: ""
+          replicationPasswordKey: ""
+  primary:
+    persistence:
+      enabled: false

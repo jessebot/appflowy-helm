@@ -4,6 +4,13 @@
 
 A Helm chart for deploying appflowy cloud on Kubernetes
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://jessebot.github.io/gotrue-helm | gotrue | 0.5.* |
+| oci://registry-1.docker.io/bitnamicharts | postgresql | 13.2.* |
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -22,6 +29,9 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | appflowy.adminFrontend.ingress.tls | list | `[]` |  |
 | appflowy.adminFrontend.service | object | `{"port":80,"targetPort":8000,"type":"ClusterIP"}` | service for the appflowy admin frontend |
 | appflowy.environment | string | `"production"` | set environment |
+| appflowy.gotrue.adminPassword | string | `""` | APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
+| appflowy.gotrue.existingSecret | string | `""` | use an existing kubernetes secret for gotrue env vars |
+| appflowy.gotrue.secretKeys.adminPassword | string | `"adminPassword"` | secret key in existing kubernetes secret for admin password |
 | appflowy.rustLog | string | `"info"` | set the log level for rust |
 | appflowy.s3.accessKeyId | string | `""` | the access key ID for your S3 endpoint |
 | appflowy.s3.bucket | string | `""` | S3 bucket for appflowy to use |
@@ -39,16 +49,33 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| extraVolumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition. |
+| extraVolumes | list | `[]` | Additional volumes on the output Deployment definition. |
 | fullnameOverride | string | `""` |  |
-| gotrue.adminEmail | string | `""` | APP__GOTRUE__ADMIN_EMAIL - set the admin email for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
-| gotrue.adminPassword | string | `""` | APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
-| gotrue.existingSecret | string | `""` | use an existing kubernetes secret for gotrue env vars |
-| gotrue.externalUrl | string | `""` | APP__GOTRUE__EXT_URL - gotrue api external URL - ignored if appflowy.gotrue.existingSecret is not empty |
-| gotrue.jwtSecret | string | `""` | APP__GOTRUE__JWT_SECRET - set the JWT secret for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
-| gotrue.secretKeys.adminEmail | string | `"adminEmail"` | secret key in existing kubernetes secret for admin Email |
-| gotrue.secretKeys.adminPassword | string | `"adminPassword"` | secret key in existing kubernetes secret for admin password |
-| gotrue.secretKeys.externalUrl | string | `"externalUrl"` | secret key in existing kubernetes secret for external URL |
-| gotrue.secretKeys.jwtSecret | string | `"jwtSecret"` | secret key in existing kubernetes secret for the jwt secret |
+| gotrue.apiHost | string | `"localhost"` | GOTRUE_API_HOST - api host |
+| gotrue.database.database | string | `"gotrue"` | name of the database on the databsae hostname ignored if databaseUrl or existingSecret are not empty |
+| gotrue.database.databaseUrl | string | `""` | database connection url e.g. postgres://supabase_auth_admin:root@postgresql.gotrue.svc.cluster.local:5432/gotrue only required if you don't pass in driver, user, host, port, and password or sslmode/sslcert/sslrootcert/sslkey. |
+| gotrue.database.driver | string | `"postgres"` | which database backend to use for gotrue ignored if databaseUrl or existingSecret are not empty |
+| gotrue.database.existingSecret | string | `""` | use an existingSecret for database. must contain keys: DATABASE_URL, GOTRUE_DB_DRIVER, DB_NAMESPACE |
+| gotrue.database.host | string | `"postgresql.gotrue.svc.cluster.local"` | database hostname - ignored if databaseUrl or existingSecret are not empty |
+| gotrue.database.namespace | string | `"auth"` | database namespace - sets the schema name |
+| gotrue.database.password | string | `""` | password to connect to database with ignored if databaseUrl or existingSecret are not empty or if sslmode is not empty |
+| gotrue.database.port | string | `"5432"` | database port - ignored if databaseUrl or existingSecret are not empty |
+| gotrue.database.sslCert | string | `""` | path to TLS cert for connecting to the database with TLS ignored if databaseUrl or existingSecret are not empty. |
+| gotrue.database.sslKey | string | `""` | path to TLS key for connecting to the database with TLS ignored if databaseUrl or existingSecret are not empty. |
+| gotrue.database.sslMode | string | `""` | mode for connecting to database with TLS e.g. verify-full ignored if databaseUrl or existingSecret are not empty. |
+| gotrue.database.sslRootCert | string | `""` | path to root TLS cert for connecting to the database with TLS ignored if databaseUrl or existingSecret are not empty. |
+| gotrue.database.user | string | `"supabase_auth_admin"` | database username - ignored if databaseUrl or existingSecret are not empty |
+| gotrue.enabled | bool | `false` | enable the gotrue subchart which takes any values from https://github.com/jessebot/gotrue-helm this chart takes presidence over appflowy.gotrue values |
+| gotrue.externalUrl | string | `"http://0.0.0.0:9999"` |  |
+| gotrue.jwt.existingSecret | string | `""` | use an existing Kubernetes secret for jwt secret |
+| gotrue.jwt.secret | string | `""` | set the JWT secret for gotrue - ignored if gotrue.jwt.existingSecret is not empty |
+| gotrue.jwt.secretKey | string | `"jwtSecret"` | key in existing kubernetes secret for the jwt secret |
+| gotrue.port | string | `"9999"` | PORT - port to use for gotrue |
+| gotrue.siteUrl | string | `"http://localhost:3000"` | GOTRUE_SITE_URL - siteUrl to use for gotrue |
+| gotrue.smtp.adminEmail | string | `""` | gotrue.smtp.adminEmail takes presidence over appflowy.gotrue.adminEmail |
+| gotrue.smtp.existingSecret | string | `""` | use an existing kubernetes secret for SMTP credentials |
+| gotrue.smtp.secretKeys.adminEmail | string | `"adminEmail"` | adminEmail secret key inside a gotrue.smtp.existingSecret |
 | image.pullPolicy | string | `"IfNotPresent"` | image pullPolicy, set to Always if using latest tag |
 | image.repository | string | `"appflowyinc/appflowy_cloud"` | image repo for the appflowy cloud image |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. ref: https://hub.docker.com/r/appflowyinc/appflowy_cloud/tags |
@@ -65,6 +92,12 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| postgresql.enabled | bool | `false` |  |
+| postgresql.fullnameOverride | string | `"appflowy-postgres"` |  |
+| postgresql.global.postgresql.auth | object | `{"database":"appflowy","existingSecret":"","password":"changeme","postgresPassword":"changeme","secretKeys":{"adminPasswordKey":"","replicationPasswordKey":"","userPasswordKey":""},"username":null}` | global.postgresql.auth overrides postgresql.auth |
+| postgresql.global.postgresql.auth.existingSecret | string | `""` | Name of existing secret to use for PostgreSQL credentials. auth.postgresPassword, auth.password, and auth.replicationPassword will be ignored and picked up from this secret. secret might also contains the key ldap-password if LDAP is enabled. ldap.bind_password will be ignored and picked from this secret in this case. |
+| postgresql.global.postgresql.auth.secretKeys | object | `{"adminPasswordKey":"","replicationPasswordKey":"","userPasswordKey":""}` | Names of keys in existing secret to use for PostgreSQL credentials |
+| postgresql.primary.persistence.enabled | bool | `false` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
@@ -74,8 +107,6 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` |  |
-| volumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition. |
-| volumes | list | `[]` | Additional volumes on the output Deployment definition. |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)

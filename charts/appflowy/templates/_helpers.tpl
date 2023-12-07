@@ -76,9 +76,12 @@ Create the name of the s3 secret to use
 Create the name of the gotrue secret to use
 */}}
 {{- define "appflowy.gotrue.secret" -}}
+{{- if .Values.gotrue.enabled }}
+{{- else }}
 {{- if .Values.gotrue.existingSecret }}
 {{- .Values.gotrue.existingSecret }}
 {{- else }}
 {{- print "appflowy-gotrue-secret" }}
 {{- end }}
-{{- end }}
+{{- end }} {{/* end if gotrue.endabled */}}
+{{- end }} {{/* end define */}}

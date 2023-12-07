@@ -63,22 +63,22 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.gotrue.secret" . }}
-                  key: {{ .Values.gotrue.secretKeys.adminEmail }}
+                  key: {{ .Values.gotrue.smtp.secretKeys.adminEmail }}
             - name: APP__GOTRUE__ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.gotrue.secret" . }}
-                  key: {{ .Values.gotrue.secretKeys.adminPassword }}
+                  key: {{ .Values.appflowy.gotrue.secretKeys.adminPassword }}
             - name: APP__GOTRUE__JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.gotrue.secret" . }}
-                  key: {{ .Values.gotrue.secretKeys.jwtSecret }}
+                  key: {{ .Values.gotrue.jwt.secretKey }}
             - name: APP__GOTRUE__EXT_URL
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.gotrue.secret" . }}
-                  key: {{ .Values.gotrue.secretKeys.externalUrl }}
+                  key: {{ .Values.gotrue.externalUrl }}
             {{- if .Values.appflowy.s3.useMinio }}
             - name: APP__S3__USE_MINIO
               value: "true"
