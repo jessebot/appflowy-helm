@@ -10,6 +10,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 |------------|------|---------|
 | https://jessebot.github.io/gotrue-helm | gotrue | 0.5.* |
 | oci://registry-1.docker.io/bitnamicharts | postgresql | 13.2.* |
+| oci://registry-1.docker.io/bitnamicharts | redis | 18.4.* |
 
 ## Values
 
@@ -98,6 +99,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | postgresql.global.postgresql.auth.existingSecret | string | `""` | Name of existing secret to use for PostgreSQL credentials. auth.postgresPassword, auth.password, and auth.replicationPassword will be ignored and picked up from this secret. secret might also contains the key ldap-password if LDAP is enabled. ldap.bind_password will be ignored and picked from this secret in this case. |
 | postgresql.global.postgresql.auth.secretKeys | object | `{"adminPasswordKey":"","replicationPasswordKey":"","userPasswordKey":""}` | Names of keys in existing secret to use for PostgreSQL credentials |
 | postgresql.primary.persistence.enabled | bool | `false` |  |
+| redis.enabled | bool | `false` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |

@@ -2,8 +2,11 @@ dependencies:
 - name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 13.2.24
+- name: redis
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 18.4.0
 - name: gotrue
   repository: https://jessebot.github.io/gotrue-helm
   version: 0.5.0
-digest: sha256:e7d251a1e47079b37a49ecbfd26b09e7f925dde4af0de58fb843b56bb8eca0ae
-generated: "2023-12-07T10:24:08.814421+01:00"
+digest: sha256:5cc15efcecafdefc02285cba42653c300d2a88af937938a4a535601b6c67eed6
+generated: "2023-12-07T10:31:02.16388+01:00"

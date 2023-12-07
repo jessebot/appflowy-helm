@@ -279,3 +279,8 @@ postgresql:
   primary:
     persistence:
       enabled: false
+
+## Redis subchart configuration - provided by Bitnami
+# for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
+redis:
+  enabled: false

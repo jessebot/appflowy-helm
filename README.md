@@ -8,6 +8,7 @@ This is a quick unofficial helm chart to deploy [AppFlowy-Cloud](https://github.
 - using existing secrets (optional)
 - gotrue subchart (optional)
 - bitnami postgresql subchart (optional)
+- bitnami redis subchart (optional)
 
 I'm still working on adding these feaures:
 

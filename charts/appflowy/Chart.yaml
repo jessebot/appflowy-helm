@@ -28,6 +28,10 @@ dependencies:
     version: 13.2.*
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled
+  - name: redis
+    version: 18.4.*
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: redis.enabled
   - name: gotrue
     version: 0.5.*
     repository: https://jessebot.github.io/gotrue-helm
