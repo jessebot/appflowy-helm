@@ -158,7 +158,7 @@ spec:
         - name: {{ .Chart.Name }}-init
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: nxyt/sqlx-cli
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["sh", "/tmp/db-migrations.sh"]
           ports:
