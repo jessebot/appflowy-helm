@@ -34,7 +34,11 @@ spec:
           command:
             - "sh"
             - "-c"
-            - "until pg_isready -h ${PGHOST} -U ${PGUSER} ; do sleep 2 ; done"
+            - "until psql -h ${PGHOST} -U ${PGUSER} -p ${PGPORT} -d ${PGDATABASE} -c '\q'; do echo 'Postgres is still unavailable - sleeping'; sleep 2; done"
+          {{- with .Values.initJob.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             {{- if .Values.externalDatabase.sslMode }}
             - name: "PGSSLMODE"
@@ -86,6 +90,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.database" . }}
+
         - name: clone-sql-migrations
           image: bitnami/git:2.43.0-debian-11-r0
           command: ["sh", "/tmp/git-clone-migrations.sh"]
@@ -94,6 +99,9 @@ spec:
               mountPath: "/tmp"
             - name: sql-scripts
               mountPath: /opt/appflowy
+          {{- with .Values.initJob.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             {{- if .Values.externalDatabase.sslMode }}
             - name: "PGSSLMODE"
