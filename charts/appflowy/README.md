@@ -103,6 +103,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | ingress.tls | list | `[]` |  |
+| initJob.exitingClaim | string | `""` | set an existing persistent volume claim name to use for cloning and running SQL migrations scripts |
 | initJob.extraVolumeMounts | list | `[]` | Additional volumeMounts for the appflowy-cloud init job |
 | initJob.extraVolumes | list | `[]` | Additional volumes for the appflowy-cloud init job |
 | livenessProbe.enabled | bool | `true` | enable liveness probes Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes |
