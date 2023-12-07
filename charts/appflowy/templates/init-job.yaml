@@ -170,6 +170,8 @@ spec:
           volumeMounts:
             - name: migrations-script
               mountPath: "/tmp"
+            - name: sql-scripts
+              mountPath: /opt/appflowy
           {{- with .Values.initJob.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
