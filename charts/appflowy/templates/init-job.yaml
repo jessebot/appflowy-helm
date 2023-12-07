@@ -30,7 +30,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: postgresql-isready
-          image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          image: bitnami/postgresql:16.1.0-debian-11-r15
           command:
             - "sh"
             - "-c"
