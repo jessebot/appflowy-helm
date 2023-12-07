@@ -29,6 +29,63 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
+        - name: postgresql-isready
+          image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          command:
+            - "sh"
+            - "-c"
+            - "until pg_isready -h ${PGHOST} -U ${PGUSER} ; do sleep 2 ; done"
+          env:
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+            {{- end }}
+
+            # - name: POSTGRES_HOST or maybe DB_HOST
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            # - name: DB_PORT
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            # - name: POSTGRES_USER or maybe DB_USER
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            # - name: POSTGRES_PASSWORD or maybe DB_PASSWORD
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            # - name: POSTGRES_DB or maybe DB_NAME?
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
         - name: clone-sql-migrations
           image: bitnami/git:2.43.0-debian-11-r0
           command: ["sh", "/tmp/git-clone-migrations.sh"]
@@ -37,6 +94,57 @@ spec:
               mountPath: "/tmp"
             - name: sql-scripts
               mountPath: /opt/appflowy
+          env:
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+            {{- end }}
+
+            # - name: POSTGRES_HOST or maybe DB_HOST
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            # - name: DB_PORT
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            # - name: POSTGRES_USER or maybe DB_USER
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            # - name: POSTGRES_PASSWORD or maybe DB_PASSWORD
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            # - name: POSTGRES_DB or maybe DB_NAME?
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
       containers:
         - name: {{ .Chart.Name }}-init
           securityContext:
