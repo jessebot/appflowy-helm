@@ -1,13 +1,10 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Job
 metadata:
-  name: {{ include "appflowy.fullname" . }}-cloud
+  name: {{ include "appflowy.fullname" . }}-cloud-init-job
   labels:
     {{- include "appflowy.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "appflowy.selectorLabels" . | nindent 6 }}
@@ -31,7 +28,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-init
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -40,31 +37,9 @@ spec:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
-          {{- if .Values.livenessProbe.enabled }}
-          livenessProbe:
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-            successThreshold: {{ .Values.livenessProbe.successThreshold }}
-            httpGet:
-              path: /
-              port: {{ .Values.service.targetPort }}
-          {{- end }}
-          {{- if .Values.readinessProbe.enabled }}
-          readinessProbe:
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.readinessProbe.successThreshold }}
-            httpGet:
-              path: /
-              port: {{ .Values.service.targetPort }}
-          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.extraVolumeMounts }}
+          {{- with .Values.initJob.extraVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -122,7 +97,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "appflowy.s3.secret" . }}
                   key: {{ .Values.appflowy.s3.secretKeys.endpoint }}
-      {{- with .Values.extraVolumes }}
+      {{- with .Values.initJob.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}

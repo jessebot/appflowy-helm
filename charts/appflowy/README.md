@@ -50,8 +50,8 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| extraVolumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition. |
-| extraVolumes | list | `[]` | Additional volumes on the output Deployment definition. |
+| extraVolumeMounts | list | `[]` | Additional volumeMounts for the appflowy-cloud Deployment |
+| extraVolumes | list | `[]` | Additional volumes for the appflowy-cloud Deployment |
 | fullnameOverride | string | `""` |  |
 | gotrue.apiHost | string | `"localhost"` | GOTRUE_API_HOST - api host |
 | gotrue.database.database | string | `"gotrue"` | name of the database on the databsae hostname ignored if databaseUrl or existingSecret are not empty |
@@ -88,6 +88,8 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | ingress.tls | list | `[]` |  |
+| initJob.extraVolumeMounts | list | `[]` | Additional volumeMounts for the appflowy-cloud init job |
+| initJob.extraVolumes | list | `[]` | Additional volumes for the appflowy-cloud init job |
 | livenessProbe.enabled | bool | `true` | enable liveness probes Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes |
 | livenessProbe.failureThreshold | int | `15` |  |
 | livenessProbe.initialDelaySeconds | int | `10` |  |
