@@ -21,7 +21,7 @@ data:
 
     for script in `ls -1 before`; do
         echo -e "Running sql script: $script"
-        psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f $script
+        psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f before/$script
     done
 
     for script in `ls -p | grep -v /`; do
