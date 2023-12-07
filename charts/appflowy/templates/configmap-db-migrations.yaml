@@ -15,12 +15,12 @@ data:
     git sparse-checkout add migrations
     cd migrations/
   db-migrations.sh: |
-  {{- if not .Values.externalDatabase.sslMode }}
-    export DATABASE_URL=postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
-  {{- else }} {{/** handle ssl connections **/}}
     # Keep pinging Postgres until it's ready to accept commands
-    export DATABASE_URL=postgres://${PGUSER}@${PGHOST}:${PGPORT}/${PGDATABASE}
-  {{- end }}
+    {{- if not .Values.externalDatabase.sslMode }}
+    export DATABASE_URL=postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
+    {{- else }} {{/** handle ssl connections **/}}
+    export DATABASE_URL=postgres://${PGUSER}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=${PGSSLMODE}&sslrootcert=${PGSSLROOTCERT}&sslkey=${PGSSLKEY}&sslcert=${PGSSLCERT}
+    {{- end }}
     cd /opt/appflowy/AppFlowy-Cloud
 
     echo "Running migrations with sqlx now!"
