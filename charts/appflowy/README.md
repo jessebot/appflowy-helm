@@ -50,6 +50,21 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| externalDatabase.database | string | `"appflowy"` | database name on database host - ignored if postgresql.enabled or externalDatabase.existingSecret not empty |
+| externalDatabase.existingSecret | string | `""` | existing Kubernetes secret to use for database credentials - ignored if postgresql.enabled |
+| externalDatabase.host | string | `""` | database hostname - ignored if postgresql.enabled or externalDatabase.existingSecret not empty |
+| externalDatabase.password | string | `""` | database password - ignored if postgresql.enabled or externalDatabase.existingSecret not empty |
+| externalDatabase.port | string | `"5432"` | database port - ignored if postgresql.enabled or externalDatabase.existingSecret not empty |
+| externalDatabase.secretKeys.database | string | `"database"` | secret key in existing kubernetes secret to use for database name on db host |
+| externalDatabase.secretKeys.host | string | `"host"` | secret key in existing kubernetes secret to use for db host |
+| externalDatabase.secretKeys.password | string | `"password"` | secret key in existing kubernetes secret to use for db password |
+| externalDatabase.secretKeys.port | string | `"port"` | secret key in existing kubernetes secret to use for db port |
+| externalDatabase.secretKeys.user | string | `"user"` | secret key in existing kubernetes secret to use for db user |
+| externalDatabase.sslCert | string | `""` | database ssl cert - ignored if postgresql.enabled |
+| externalDatabase.sslKey | string | `""` | database ssl key - ignored if postgresql.enabled |
+| externalDatabase.sslMode | string | `""` | database ssl mode e.g. verify-full - ignored if postgresql.enabled |
+| externalDatabase.sslRootCert | string | `""` | database ssl root cert - ignored if postgresql.enabled |
+| externalDatabase.user | string | `"appflowy"` | database user - ignored if postgresql.enabled or externalDatabase.existingSecret not empty |
 | extraVolumeMounts | list | `[]` | Additional volumeMounts for the appflowy-cloud Deployment |
 | extraVolumes | list | `[]` | Additional volumes for the appflowy-cloud Deployment |
 | fullnameOverride | string | `""` |  |

@@ -73,6 +73,78 @@ Create the name of the s3 secret to use
 {{- end }}
 
 {{/*
+Create the name of the database secret to use
+*/}}
+{{- define "appflowy.db.secret" -}}
+{{- if and .Values.postgresql.enabled .Values.postgresql.global.postgresql.auth.existingSecret }}
+{{- .Values.postgresql.global.postgresql.auth.existingSecret }}
+{{- else if .Values.externalDatabase.existingSecret }}
+{{- .Values.externalDatabase.existingSecret }}
+{{- else }}
+{{- print "appflowy-db-secret" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the database secret key for db hostname
+*/}}
+{{- define "appflowy.db.secretKey.host" -}}
+{{- if .Values.externalDatabase.existingSecret }}
+{{- .Values.externalDatabase.secretKeys.host }}
+{{- else }}
+{{- print "host" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the database secret key for db port
+*/}}
+{{- define "appflowy.db.secretKey.port" -}}
+{{- if .Values.externalDatabase.existingSecret }}
+{{- .Values.externalDatabase.secretKeys.port }}
+{{- else }}
+{{- print "port" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the database secret key for database name
+*/}}
+{{- define "appflowy.db.secretKey.database" -}}
+{{- if .Values.externalDatabase.existingSecret }}
+{{- .Values.externalDatabase.secretKeys.database }}
+{{- else }}
+{{- print "database" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the database secret key for db user
+*/}}
+{{- define "appflowy.db.secretKey.user" -}}
+{{- if and .Values.postgresql.enabled }}
+{{- print "user" }}
+{{- else if .Values.externalDatabase.existingSecret }}
+{{- .Values.externalDatabase.secretKeys.user }}
+{{- else }}
+{{- print "user" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the database secret key for db user password
+*/}}
+{{- define "appflowy.db.secretKey.userPassword" -}}
+{{- if and .Values.postgresql.enabled .Values.postgresql.global.postgresql.auth.existingSecret }}
+{{- .Values.postgresql.global.postgresql.auth.secretKeys.userPasswordKey }}
+{{- else if .Values.externalDatabase.existingSecret }}
+{{- .Values.externalDatabase.secretKeys.password }}
+{{- else }}
+{{- print "password" }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create the name of the gotrue secret to use
 */}}
 {{- define "appflowy.gotrue.secret" -}}

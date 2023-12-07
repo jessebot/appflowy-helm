@@ -303,6 +303,44 @@ postgresql:
     persistence:
       enabled: false
 
+
+## external database to use for appflowy
+# do not use if postgresql.enabled is set to true
+externalDatabase:
+  # -- database hostname - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  host: ""
+  # -- database port - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  port: "5432"
+  # -- database user - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  user: "appflowy"
+  # -- database password - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  password: ""
+  # -- database name on database host - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  database: "appflowy"
+  # -- database ssl mode e.g. verify-full - ignored if postgresql.enabled
+  sslMode: ""
+  # -- database ssl cert - ignored if postgresql.enabled
+  sslCert: ""
+  # -- database ssl root cert - ignored if postgresql.enabled
+  sslRootCert: ""
+  # -- database ssl key - ignored if postgresql.enabled
+  sslKey: ""
+  # -- existing Kubernetes secret to use for database credentials - ignored if postgresql.enabled
+  existingSecret: ""
+  # secret keys in existing database secret
+  secretKeys:
+    # -- secret key in existing kubernetes secret to use for db host
+    host: "host"
+    # -- secret key in existing kubernetes secret to use for db port
+    port: "port"
+    # -- secret key in existing kubernetes secret to use for db user
+    user: "user"
+    # -- secret key in existing kubernetes secret to use for db password
+    password: "password"
+    # -- secret key in existing kubernetes secret to use for database name on db host
+    database: "database"
+
+
 ## Redis subchart configuration - provided by Bitnami
 # for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
 redis:
