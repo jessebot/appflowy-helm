@@ -21,11 +21,11 @@ data:
     # Keep pinging Postgres until it's ready to accept commands
     export DATABASE_URL=postgres://${PGUSER}@${PGHOST}:${PGPORT}/${PGDATABASE}
   {{- end }}
-    echo "Postgres is up and running on port ${PGPORT} - running migrations now!"
-
     cd /opt/appflowy/AppFlowy-Cloud
+
+    echo "Running migrations with sqlx now!"
 
     sqlx database create
     sqlx migrate run
 
-    >&2 echo "Postgres has been migrated, ready to go!"
+    echo "Postgres has been migrated, ready to go!"
