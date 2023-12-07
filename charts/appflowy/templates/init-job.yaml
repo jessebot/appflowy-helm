@@ -34,7 +34,8 @@ spec:
           command:
             - "sh"
             - "-c"
-            - "until psql -h ${PGHOST} -U ${PGUSER} -p ${PGPORT} -d ${PGDATABASE} -c '\q'; do echo 'Postgres is still unavailable - sleeping'; sleep 2; done"
+            - |
+              until psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -c '\q'; do echo 'Postgres is still unavailable - sleeping'; sleep 2; done
           {{- with .Values.initJob.extraVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
