@@ -158,7 +158,7 @@ spec:
         - name: {{ .Chart.Name }}-init
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: nxyt/sqlx-cli
+          image: bitnami/postgresql:16.1.0-debian-11-r15
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["sh", "/tmp/db-migrations.sh"]
           ports:

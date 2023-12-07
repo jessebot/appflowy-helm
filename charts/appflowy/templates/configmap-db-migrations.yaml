@@ -21,11 +21,10 @@ data:
     export DATABASE_URL="postgres://${PGUSER}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=${PGSSLMODE}&sslrootcert=${PGSSLROOTCERT}&sslkey=${PGSSLKEY}&sslcert=${PGSSLCERT}"
     echo -e "Proceeding with DATABASE_URL: $DATABASE_URL"
     {{- end }}
-    cd /opt/appflowy/AppFlowy-Cloud
+    cd /opt/appflowy/AppFlowy-Cloud/migrations
 
     echo "Running migrations with sqlx now!"
 
-    sqlx database create --database-url $DATABASE_URL
-    sqlx migrate run --database-url $DATABASE_URL
-
-    echo "Postgres has been migrated, ready to go!"
+    for script in `ls -1`; do
+        psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f $script
+    done
