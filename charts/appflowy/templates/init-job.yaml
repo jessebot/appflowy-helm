@@ -38,6 +38,8 @@ spec:
           volumeMounts:
             - name: migrations-script
               mountPath: "/tmp"
+            - name: sql-scripts
+              mountPath: /opt/appflowy
       containers:
         - name: {{ .Chart.Name }}-init
           securityContext:
@@ -112,6 +114,13 @@ spec:
         - name: migrations-script
           configMap:
             name: db-init
+        - name: sql-scripts
+          persistentVolumeClaim:
+            {{- if .Values.initJob.existingClaim }}
+            claimName: {{ .Values.initJob.existingClaim }}
+            {{- else }}
+            claimName: sql-migrations
+            {{- end }}
       {{- with .Values.initJob.extraVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}

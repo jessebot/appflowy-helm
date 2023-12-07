@@ -347,8 +347,12 @@ redis:
   enabled: false
 
 
-# init job to initialize appflowy
+# init job with a helm hook to initialize appflowy's database
+# creates a optional temp pvc to store migrations scripts
+# 
 initJob:
+  # -- set an existing persistent volume claim name to use for cloning and running SQL migrations scripts
+  exitingClaim: ""
   # -- Additional volumes for the appflowy-cloud init job
   extraVolumes: []
   # - name: foo

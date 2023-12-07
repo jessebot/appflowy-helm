@@ -9,39 +9,35 @@ metadata:
     "helm.sh/hook-delete-policy": hook-succeeded
 data:
   git-clone-migrations.sh: |
+    cd /opt/appflowy
     git clone --filter=blob:none --sparse git@github.com:AppFlowy-IO/AppFlowy-Cloud.git
     cd AppFlowy-Cloud/
     git sparse-checkout add migrations
     cd migrations/
-  {{- if not .Values.externalDatabase.sslMode }}
   db-migrations.sh: |
+  {{- if not .Values.externalDatabase.sslMode }}
     # Keep pinging Postgres until it's ready to accept commands
     until PGPASSWORD=${PGPASSWORD} psql -h "${PGHOST}" -U "${PGUSER}" -p "${PGPORT}" -d "postgres" -c '\q'; do
-      >&2 echo "Postgres is still unavailable - sleeping"
+      echo "Postgres is still unavailable - sleeping"
       sleep 1
     done
 
-    >&2 echo "Postgres is up and running on port ${PGPORT} - running migrations now!"
-
     export DATABASE_URL=postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
-    sqlx database create
-    sqlx migrate run
-
-    >&2 echo "Postgres has been migrated, ready to go!"
   {{- else }} {{/** handle ssl connections **/}}
-  db-migrations.sh: |
     # Keep pinging Postgres until it's ready to accept commands
     until psql -h "${PGHOST}" -U "${PGUSER}" -p "${PGPORT}" -d "postgres" -c '\q'; do
 
-      >&2 echo "Postgres is still unavailable - sleeping"
+      echo "Postgres is still unavailable - sleeping"
       sleep 1
     done
 
-    >&2 echo "Postgres is up and running on port ${PGPORT} - running migrations now!"
-
     export DATABASE_URL=postgres://${PGUSER}@${PGHOST}:${PGPORT}/${PGDATABASE}
+  {{- end }}
+    echo "Postgres is up and running on port ${PGPORT} - running migrations now!"
+
+    cd /opt/appflowy/AppFlowy-Cloud
+
     sqlx database create
     sqlx migrate run
 
     >&2 echo "Postgres has been migrated, ready to go!"
-  {{- end }}
