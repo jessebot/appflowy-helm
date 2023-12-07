@@ -10,7 +10,7 @@ metadata:
 data:
   git-clone-migrations.sh: |
     cd /opt/appflowy
-    git clone --filter=blob:none --sparse git@github.com:AppFlowy-IO/AppFlowy-Cloud.git
+    git clone --filter=blob:none --sparse https://github.com/AppFlowy-IO/AppFlowy-Cloud.git
     cd AppFlowy-Cloud/
     git sparse-checkout add migrations
     cd migrations/
