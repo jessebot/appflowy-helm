@@ -4,6 +4,10 @@ metadata:
   name: {{ include "appflowy.fullname" . }}-cloud-init-job
   labels:
     {{- include "appflowy.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   selector:
     matchLabels:
@@ -27,6 +31,13 @@ spec:
       serviceAccountName: {{ include "appflowy.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: clone-sql-migrations
+          image: bitnami/git:2.43.0-debian-11-r0
+          command: ["sh", "/tmp/git-clone-migrations.sh"]
+          volumeMounts:
+            - name: migrations-script
+              mountPath: "/tmp"
       containers:
         - name: {{ .Chart.Name }}-init
           securityContext:

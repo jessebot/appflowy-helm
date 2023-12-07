@@ -3,7 +3,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: db-init
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-4"
+    "helm.sh/hook-delete-policy": hook-succeeded
 data:
+  git-clone-migrations.sh: |
+    git clone --filter=blob:none --sparse git@github.com:AppFlowy-IO/AppFlowy-Cloud.git
+    cd AppFlowy-Cloud/
+    git sparse-checkout add migrations
+    cd migrations/
   {{- if not .Values.externalDatabase.sslMode }}
   db-migrations.sh: |
     # Keep pinging Postgres until it's ready to accept commands
