@@ -6,7 +6,7 @@ metadata:
     {{- include "appflowy.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-weight": "-4"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
