@@ -94,6 +94,28 @@ appflowy:
       # -- secret key in existing kubernetes secret for admin password
       adminPassword: "adminPassword"
 
+## Liveness and readiness probe values
+##
+livenessProbe:
+  # -- enable liveness probes
+  # Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  failureThreshold: 15
+  successThreshold: 1
+
+readinessProbe:
+  # -- enable readiness probes
+  # Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  failureThreshold: 15
+  successThreshold: 1
+
 # -- service for appflowy_cloudy
 service:
   type: ClusterIP
