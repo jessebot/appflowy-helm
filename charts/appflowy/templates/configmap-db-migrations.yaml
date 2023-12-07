@@ -19,11 +19,6 @@ data:
 
     echo "Running migrations with sqlx now!"
 
-    for script in `ls -1 before`; do
-        echo "\n=============================== Running sql script: $script \n==============================="
-        psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f before/$script
-    done
-
     for script in `ls -p | grep -v /`; do
         echo "\n=============================== Running sql script: $script \n==============================="
         psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f $script
