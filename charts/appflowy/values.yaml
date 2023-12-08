@@ -351,6 +351,7 @@ redis:
 # creates a optional temp pvc to store migrations scripts
 # 
 initJob:
+  enabled: false
   # -- set an existing persistent volume claim name to use for cloning and running SQL migrations scripts
   exitingClaim: ""
   # -- Additional volumes for the appflowy-cloud init job

@@ -1,3 +1,4 @@
+{{- if .Values.initJob.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -23,3 +24,4 @@ data:
         echo "\n=============================== Running sql script: $script \n==============================="
         psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f $script
     done
+{{- end }} {{/** end if .Values.initJob.enabled **/}}

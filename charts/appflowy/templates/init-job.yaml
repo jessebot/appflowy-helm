@@ -1,3 +1,4 @@
+{{- if .Values.initJob.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -252,3 +253,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }} {{/** end if .Values.initJob.enabled **/}}
