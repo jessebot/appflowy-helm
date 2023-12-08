@@ -145,6 +145,12 @@ spec:
 
             - name: APP__DATABASE__REQUIRE_SSL
               value: "true"
+
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: DATABASE_URL
             {{- end }}
 
             # - name: PGHOST
