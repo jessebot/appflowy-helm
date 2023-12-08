@@ -94,10 +94,7 @@ spec:
                   key: {{ .Values.gotrue.jwt.secretKey }}
 
             - name: APP__GOTRUE__EXT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "appflowy.gotrue.secret" . }}
-                  key: {{ .Values.gotrue.externalUrl }}
+              value: {{ .Values.gotrue.externalUrl }}
 
             {{- if .Values.appflowy.s3.useMinio }}
             - name: APP__S3__USE_MINIO
