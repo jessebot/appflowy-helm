@@ -11,16 +11,23 @@ metadata:
 data:
   git-clone-migrations.sh: |
     cd /opt/appflowy
+    echo "Doing a sparse git clone of the AppFlowy-Cloud migrations directory"
     git clone --filter=blob:none --sparse https://github.com/AppFlowy-IO/AppFlowy-Cloud.git
     cd AppFlowy-Cloud/
     git sparse-checkout add migrations
     cd migrations/
+    echo "Sparse checkout of the AppFlowy-Cloud migrations directory complete!"
+
+  # for script in `ls -p | grep -v /`; do
+  #     echo "\n=============================== Running sql script: $script \n==============================="
+  #     psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f $script
+  # done
   db-migrations.sh: |
     cd /opt/appflowy/AppFlowy-Cloud/migrations
 
     echo "Running migrations with sqlx now!"
 
-    for script in `ls -p | grep -v /`; do
+    for script in `ls -1 before`; do
         echo "\n=============================== Running sql script: $script \n==============================="
         psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -f $script
     done
