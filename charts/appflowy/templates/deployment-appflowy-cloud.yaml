@@ -145,40 +145,43 @@ spec:
 
             - name: "PGSSLROOTCERT"
               value: {{ .Values.externalDatabase.sslRootCert }}
+
+            - name: APP__DATABASE__REQUIRE_SSL
+              value: "true"
             {{- end }}
 
-            # - name: POSTGRES_HOST or maybe DB_HOST
-            - name: PGHOST
+            # - name: PGHOST
+            - name: APP__DATABASE__HOST
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.host" . }}
 
-            # - name: DB_PORT
-            - name: PGPORT
+            # - name: PGPORT
+            - name: APP__DATABASE__PORT
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.port" . }}
 
-            # - name: POSTGRES_USER or maybe DB_USER
-            - name: PGUSER
+            # - name: PGUSER
+            - name: APP__DATABASE__USERNAME
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.user" . }}
 
             {{- if not .Values.externalDatabase.sslMode }}
-            # - name: POSTGRES_PASSWORD or maybe DB_PASSWORD
-            - name: PGPASSWORD
+            # - name: PGPASSWORD
+            - name: APP__DATABASE__PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.userPassword" . }}
             {{- end }}
 
-            # - name: POSTGRES_DB or maybe DB_NAME?
-            - name: PGDATABASE
+            # - name: PGDATABASE
+            - name: APP__DATABASE__DATABASE_NAME
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
