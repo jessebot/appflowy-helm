@@ -78,7 +78,7 @@ spec:
             - name: APP__GOTRUE__ADMIN_EMAIL
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "appflowy.gotrue.secret" . }}
+                  name: {{ include "appflowy.gotrue.smtpSecret" . }}
                   key: {{ .Values.gotrue.smtp.secretKeys.adminEmail }}
 
             - name: APP__GOTRUE__ADMIN_PASSWORD
@@ -90,7 +90,7 @@ spec:
             - name: APP__GOTRUE__JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "appflowy.gotrue.secret" . }}
+                  name: {{ include "appflowy.gotrue.jwtSecret" . }}
                   key: {{ .Values.gotrue.jwt.secretKey }}
 
             - name: APP__GOTRUE__EXT_URL

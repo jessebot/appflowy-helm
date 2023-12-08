@@ -148,12 +148,31 @@ Create the name of the database secret key for db user password
 Create the name of the gotrue secret to use
 */}}
 {{- define "appflowy.gotrue.secret" -}}
-{{- if .Values.gotrue.enabled }}
-{{- else }}
-{{- if .Values.gotrue.existingSecret }}
-{{- .Values.gotrue.existingSecret }}
+{{- if .Values.appflowy.gotrue.existingSecret }}
+{{- .Values.appflowy.gotrue.existingSecret }}
 {{- else }}
 {{- print "appflowy-gotrue-secret" }}
 {{- end }}
-{{- end }} {{/* end if gotrue.endabled */}}
+{{- end }} {{/* end define */}}
+
+{{/*
+Create the name of the gotrue jwt secret to use
+*/}}
+{{- define "appflowy.gotrue.jwtSecret" -}}
+{{- if .Values.gotrue.jwt.existingSecret }}
+{{- .Values.gotrue.jwt.existingSecret }}
+{{- else }}
+{{- print "gotrue-jwt-secret" }}
+{{- end }}
+{{- end }} {{/* end define */}}
+
+{{/*
+Create the name of the gotrue jwt secret to use
+*/}}
+{{- define "appflowy.gotrue.smtpSecret" -}}
+{{- if .Values.gotrue.smtp.existingSecret }}
+{{- .Values.gotrue.smtp.existingSecret }}
+{{- else }}
+{{- print "gotrue-smtp-secret" }}
+{{- end }}
 {{- end }} {{/* end define */}}
