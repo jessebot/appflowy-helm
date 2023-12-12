@@ -36,6 +36,12 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.appflowy.adminFrontend.image.repository }}:{{ .Values.appflowy.adminFrontend.image.tag }}"
           imagePullPolicy: {{ .Values.appflowy.adminFrontend.image.pullPolicy }}
+          env:
+            - name: APP__GOTRUE__JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.jwtSecret" . }}
+                  key: {{ .Values.gotrue.jwt.secretKey }}
           ports:
             - name: http
               containerPort: {{ .Values.appflowy.adminFrontend.service.targetPort }}
