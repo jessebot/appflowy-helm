@@ -42,6 +42,66 @@ spec:
                 secretKeyRef:
                   name: {{ include "appflowy.gotrue.jwtSecret" . }}
                   key: {{ .Values.gotrue.jwt.secretKey }}
+
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+
+            - name: APP__DATABASE__REQUIRE_SSL
+              value: "true"
+
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: DATABASE_URL
+            {{- end }}
+
+            # - name: PGHOST
+            - name: APP__DATABASE__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            # - name: PGPORT
+            - name: APP__DATABASE__PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            # - name: PGUSER
+            - name: APP__DATABASE__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            # - name: PGPASSWORD
+            - name: APP__DATABASE__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            # - name: PGDATABASE
+            - name: APP__DATABASE__DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
           ports:
             - name: http
               containerPort: {{ .Values.appflowy.adminFrontend.service.targetPort }}
@@ -56,11 +116,11 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+          {{- with .Values.extraVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
+      {{- with .Values.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
