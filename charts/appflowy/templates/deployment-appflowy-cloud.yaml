@@ -197,7 +197,7 @@ spec:
 
             {{- if .Values.redis.enabled }}
             - name: APP__REDIS_URI
-              value: redis://{{ template "common.names.fullname" .Subcharts.redis }}:6379
+              value: redis://{{ template "common.names.fullname" .Subcharts.redis }}-master:6379
             {{- end }}
 
       {{- with .Values.extraVolumes }}
