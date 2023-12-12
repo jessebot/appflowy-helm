@@ -100,25 +100,25 @@ spec:
             - name: APP__S3__USE_MINIO
               value: "true"
             {{- end }}
-            - name: APP__S3__AWS_ACCESS_KEY_ID
+            - name: APP__S3__ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.s3.secret" . }}
                   key: {{ .Values.appflowy.s3.secretKeys.accessKeyId }}
 
-            - name: APP__S3__AWS_SECRET_ACCESS_KEY
+            - name: APP__S3__SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.s3.secret" . }}
                   key: {{ .Values.appflowy.s3.secretKeys.secretAccessKey }}
 
-            - name: APP__S3__AWS_REGION
+            - name: APP__S3__REGION
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.s3.secret" . }}
                   key: {{ .Values.appflowy.s3.secretKeys.region }}
 
-            - name: APP__S3__AWS_BUCKET
+            - name: APP__S3__BUCKET
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.s3.secret" . }}
