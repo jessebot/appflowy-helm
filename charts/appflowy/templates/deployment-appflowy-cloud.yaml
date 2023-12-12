@@ -75,6 +75,11 @@ spec:
             - name: RUST_LOG
               value: {{ .Values.appflowy.rustLog }}
 
+            {{- if .Values.appflowy.rustBacktrace }}
+            - name: RUST_BACKTRACE
+              value: {{ .Values.appflowy.rustBacktrace }}
+            {{- end }}
+
             - name: APP__GOTRUE__ADMIN_EMAIL
               valueFrom:
                 secretKeyRef:

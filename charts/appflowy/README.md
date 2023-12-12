@@ -33,7 +33,8 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | appflowy.gotrue.adminPassword | string | `""` | APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty |
 | appflowy.gotrue.existingSecret | string | `""` | use an existing kubernetes secret for gotrue env vars |
 | appflowy.gotrue.secretKeys.adminPassword | string | `"adminPassword"` | secret key in existing kubernetes secret for admin password |
-| appflowy.rustLog | string | `"info"` | set the log level for rust |
+| appflowy.rustBacktrace | string | `""` | set to "full" for a verbose backtrace |
+| appflowy.rustLog | string | `"info"` | set the log level for rust. options: trace, debug, info, warn, error |
 | appflowy.s3.accessKeyId | string | `""` | the access key ID for your S3 endpoint |
 | appflowy.s3.bucket | string | `""` | S3 bucket for appflowy to use |
 | appflowy.s3.endpoint | string | `"http://minio:9000"` | your S3 endpoint |

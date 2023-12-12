@@ -48,8 +48,10 @@ appflowy:
       # -- secret key in existing k8s secret for s3 bucket
       bucket: "bucket"
 
-  # -- set the log level for rust
+  # -- set the log level for rust. options: trace, debug, info, warn, error
   rustLog: "info"
+  # -- set to "full" for a verbose backtrace
+  rustBacktrace: ""
 
   adminFrontend:
     # -- whether or not to deploy the admin frontend
