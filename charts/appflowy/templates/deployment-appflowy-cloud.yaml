@@ -195,6 +195,11 @@ spec:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.database" . }}
 
+            {{- if .Values.redis.enabled }}
+            - name: APP__REDIS_URI
+              value: redis://{{ template "common.names.fullname" .Subcharts.redis }}:6379
+            {{- end }}
+
       {{- with .Values.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
