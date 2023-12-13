@@ -48,7 +48,7 @@ spec:
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
             successThreshold: {{ .Values.livenessProbe.successThreshold }}
             httpGet:
-              path: /
+              path: /metrics
               port: {{ .Values.service.targetPort }}
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
@@ -59,7 +59,7 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
             successThreshold: {{ .Values.readinessProbe.successThreshold }}
             httpGet:
-              path: /
+              path: /metrics
               port: {{ .Values.service.targetPort }}
           {{- end }}
           resources:
