@@ -191,7 +191,7 @@ spec:
                   key: {{ include "appflowy.db.secretKey.database" . }}
 
             {{- if .Values.redis.enabled }}
-            - name: REDIS_URI
+            - name: APP__REDIS_URI
               value: redis://{{ template "common.names.fullname" .Subcharts.redis }}-master:6379
             {{- end }}
 
