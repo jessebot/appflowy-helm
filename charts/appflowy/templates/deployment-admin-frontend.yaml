@@ -1,0 +1,140 @@
+{{- if .Values.appflowy.adminFrontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "appflowy.fullname" . }}-admin-frontend
+  labels:
+    {{- include "appflowy.adminFrontend.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "appflowy.adminFrontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "appflowy.adminFrontend.labels" . | nindent 8 }}
+	{{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "appflowy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: admin-frontend
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.appflowy.adminFrontend.image.repository }}:{{ .Values.appflowy.adminFrontend.image.tag }}"
+          imagePullPolicy: {{ .Values.appflowy.adminFrontend.image.pullPolicy }}
+          env:
+            - name: APP__GOTRUE__JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.jwtSecret" . }}
+                  key: {{ .Values.gotrue.jwt.secretKey }}
+
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+
+            - name: APP__DATABASE__REQUIRE_SSL
+              value: "true"
+
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: DATABASE_URL
+            {{- end }}
+
+            # - name: PGHOST
+            - name: APP__DATABASE__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            # - name: PGPORT
+            - name: APP__DATABASE__PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            # - name: PGUSER
+            - name: APP__DATABASE__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            # - name: PGPASSWORD
+            - name: APP__DATABASE__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            # - name: PGDATABASE
+            - name: APP__DATABASE__DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.appflowy.adminFrontend.service.targetPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

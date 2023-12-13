@@ -1,0 +1,370 @@
+---
+# Default values for appflowy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  # -- image repo for the appflowy cloud image
+  repository: appflowyinc/appflowy_cloud
+  # -- image pullPolicy, set to Always if using latest tag
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  # ref: https://hub.docker.com/r/appflowyinc/appflowy_cloud/tags
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+appflowy:
+  # -- set environment
+  environment: "production"
+  s3:
+    # -- the access key ID for your S3 endpoint
+    accessKeyId: ""
+    # -- the secret access key for your S3 endpoint
+    secretAccessKey: ""
+    # -- your S3 endpoint
+    endpoint: "http://minio:9000"
+    # -- region your S3 bucket is in
+    region: ""
+    # --  S3 bucket for appflowy to use
+    bucket: ""
+    # -- whether or not to use minio
+    useMinio: false
+    # -- use an existing kubernetes secret for s3 credentials
+    existingSecret: ""
+    secretKeys:
+      # -- secret key in existing k8s secret for s3 accessKeyId
+      accessKeyId: "accessKeyId"
+      # -- secret key in existing k8s secret for s3 secretAccessKey
+      secretAccessKey: "secretAccessKey"
+      # -- secret key in existing k8s secret for s3 endpoint
+      endpoint: "endpoint"
+      # -- secret key in existing k8s secret for s3 region
+      region: "region"
+      # -- secret key in existing k8s secret for s3 bucket
+      bucket: "bucket"
+
+  # -- set the log level for rust. options: trace, debug, info, warn, error
+  rustLog: "info"
+  # -- set to "full" for a verbose backtrace
+  rustBacktrace: ""
+
+  adminFrontend:
+    # -- whether or not to deploy the admin frontend
+    enabled: true
+    image:
+      # -- docker repository for the admin frontend
+      repository: appflowyinc/admin_frontend
+      # -- image pullPolicy for the admin frontend. set to Always if using latest tag
+      pullPolicy: IfNotPresent
+      # -- image tag to use for the admin frontend container
+      # ref: https://hub.docker.com/r/appflowyinc/admin_frontend/tags
+      tag: v0.0.1
+
+    # -- service for the appflowy admin frontend
+    service:
+      type: ClusterIP
+      port: 8000
+      targetPort: 8000
+
+    ingress:
+      # -- enable ingress, access from outside the cluster, for the admin frontend
+      enabled: false
+      className: "nginx"
+      annotations: {}
+      hosts:
+        - host: chart-example.local
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls: []
+      #  - secretName: chart-example-tls
+      #    hosts:
+      #      - chart-example.local
+
+  gotrue:
+    # -- APP__GOTRUE__ADMIN_PASSWORD - set the admin password for gotrue - ignored if appflowy.gotrue.existingSecret is not empty
+    adminPassword: ""
+    # -- use an existing kubernetes secret for gotrue env vars
+    existingSecret: ""
+    # secret keys to use in existing kubernetes secret for gotrue info
+    secretKeys:
+      # -- secret key in existing kubernetes secret for admin password
+      adminPassword: "adminPassword"
+
+## Liveness and readiness probe values
+##
+livenessProbe:
+  # -- enable liveness probes
+  # Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  failureThreshold: 15
+  successThreshold: 1
+
+readinessProbe:
+  # -- enable readiness probes
+  # Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  failureThreshold: 15
+  successThreshold: 1
+
+# -- service for appflowy_cloudy
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+ingress:
+  # -- enable ingress, access from outside the cluster
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# -- Additional volumes for the appflowy-cloud Deployment
+extraVolumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# -- Additional volumeMounts for the appflowy-cloud Deployment
+extraVolumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## optional gotrue subchart
+#
+gotrue:
+  # -- enable the gotrue subchart which takes any values from https://github.com/jessebot/gotrue-helm
+  # this chart takes presidence over appflowy.gotrue values
+  enabled: false
+  # -- GOTRUE_SITE_URL - siteUrl to use for gotrue
+  siteUrl: "http://localhost:3000"
+  # -- API_EXTERNAL_URL - gotrue api external URL -- gotrue.externalUrl takes presidence over appflowy.gotrue.externalUrl
+  externalUrl: "http://0.0.0.0:9999"
+  # -- GOTRUE_API_HOST - api host
+  apiHost: "localhost"
+  # -- PORT - port to use for gotrue
+  port: "9999"
+
+  ## gotrue smtp section
+  smtp:
+    # -- gotrue.smtp.adminEmail takes presidence over appflowy.gotrue.adminEmail
+    adminEmail: ""
+    # -- use an existing kubernetes secret for SMTP credentials
+    existingSecret: ""
+    # keys inside the existing kubernetes secret
+    secretKeys:
+      # -- adminEmail secret key inside a gotrue.smtp.existingSecret
+      adminEmail: "adminEmail"
+
+  ## gotrue jwt section
+  jwt:
+    # -- set the JWT secret for gotrue - ignored if gotrue.jwt.existingSecret is not empty
+    secret: ""
+    # -- use an existing Kubernetes secret for jwt secret
+    existingSecret: ""
+    # -- key in existing kubernetes secret for the jwt secret
+    secretKey: "jwtSecret"
+
+  ## gotrue database section
+  database:
+    # -- use an existingSecret for database. must contain keys: DATABASE_URL, GOTRUE_DB_DRIVER, DB_NAMESPACE
+    existingSecret: ""
+    # -- which database backend to use for gotrue
+    # ignored if databaseUrl or existingSecret are not empty
+    driver: postgres
+    # -- database username - ignored if databaseUrl or existingSecret are not empty
+    user: "supabase_auth_admin"
+    # -- database hostname - ignored if databaseUrl or existingSecret are not empty
+    host: "postgresql.gotrue.svc.cluster.local"
+    # -- database port - ignored if databaseUrl or existingSecret are not empty
+    port: "5432"
+    # -- name of the database on the databsae hostname
+    # ignored if databaseUrl or existingSecret are not empty
+    database: "gotrue"
+    # -- password to connect to database with
+    # ignored if databaseUrl or existingSecret are not empty or if sslmode is not empty
+    password: ""
+    # -- mode for connecting to database with TLS e.g. verify-full
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslMode: ""
+    # -- path to root TLS cert for connecting to the database with TLS
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslRootCert: ""
+    # -- path to TLS cert for connecting to the database with TLS
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslCert: ""
+    # -- path to TLS key for connecting to the database with TLS
+    # ignored if databaseUrl or existingSecret are not empty.
+    sslKey: ""
+    # -- database namespace - sets the schema name
+    namespace: "auth"
+    # -- database connection url
+    # e.g. postgres://supabase_auth_admin:root@postgresql.gotrue.svc.cluster.local:5432/gotrue
+    # only required if you don't pass in driver, user, host, port, and
+    # password or sslmode/sslcert/sslrootcert/sslkey.
+    databaseUrl: ""
+
+
+## PostgreSQL subchart configuration - provided by bitnami
+## for more options see https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+##
+postgresql:
+  enabled: false
+  fullnameOverride: appflowy-postgres
+  global:
+    postgresql:
+      # -- global.postgresql.auth overrides postgresql.auth
+      auth:
+        username: appflowy
+        password: changeme
+        database: appflowy
+        postgresPassword: changeme
+        # -- Name of existing secret to use for PostgreSQL credentials.
+        # auth.postgresPassword, auth.password, and auth.replicationPassword will be ignored and picked up from this secret.
+        # secret might also contains the key ldap-password if LDAP is enabled.
+        # ldap.bind_password will be ignored and picked from this secret in this case.
+        existingSecret: ""
+        # -- Names of keys in existing secret to use for PostgreSQL credentials
+        secretKeys:
+          adminPasswordKey: ""
+          userPasswordKey: ""
+          replicationPasswordKey: ""
+  primary:
+    persistence:
+      enabled: false
+
+
+## external database to use for appflowy
+# do not use if postgresql.enabled is set to true
+externalDatabase:
+  # -- database hostname - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  host: ""
+  # -- database port - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  port: "5432"
+  # -- database user - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  user: "appflowy"
+  # -- database password - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  password: ""
+  # -- database name on database host - ignored if postgresql.enabled or externalDatabase.existingSecret not empty
+  database: "appflowy"
+  # -- database ssl mode e.g. verify-full - ignored if postgresql.enabled
+  sslMode: ""
+  # -- database ssl cert - ignored if postgresql.enabled
+  sslCert: ""
+  # -- database ssl root cert - ignored if postgresql.enabled
+  sslRootCert: ""
+  # -- database ssl key - ignored if postgresql.enabled
+  sslKey: ""
+  # -- existing Kubernetes secret to use for database credentials - ignored if postgresql.enabled
+  existingSecret: ""
+  # secret keys in existing database secret
+  secretKeys:
+    # -- secret key in existing kubernetes secret to use for db host
+    host: "host"
+    # -- secret key in existing kubernetes secret to use for db port
+    port: "port"
+    # -- secret key in existing kubernetes secret to use for db user
+    user: "user"
+    # -- secret key in existing kubernetes secret to use for db password
+    password: "password"
+    # -- secret key in existing kubernetes secret to use for database name on db host
+    database: "database"
+
+
+## Redis subchart configuration - provided by Bitnami
+# for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
+redis:
+  enabled: false
+
+
+# init job with a helm hook to initialize appflowy's database
+# creates a optional temp pvc to store migrations scripts
+# 
+initJob:
+  enabled: false
+  # -- set an existing persistent volume claim name to use for cloning and running SQL migrations scripts
+  exitingClaim: ""
+  # -- Additional volumes for the appflowy-cloud init job
+  extraVolumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # -- Additional volumeMounts for the appflowy-cloud init job
+  extraVolumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true

@@ -1,0 +1,213 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "appflowy.fullname" . }}-cloud
+  labels:
+    {{- include "appflowy.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "appflowy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "appflowy.labels" . | nindent 8 }}
+	{{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "appflowy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            httpGet:
+              path: /metrics
+              port: {{ .Values.service.targetPort }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            httpGet:
+              path: /metrics
+              port: {{ .Values.service.targetPort }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: APP_ENVIRONMENT
+              value: {{ .Values.appflowy.environment }}
+
+            - name: RUST_LOG
+              value: {{ .Values.appflowy.rustLog }}
+
+            {{- if .Values.appflowy.rustBacktrace }}
+            - name: RUST_BACKTRACE
+              value: {{ .Values.appflowy.rustBacktrace }}
+            {{- end }}
+
+            - name: APP__GOTRUE__ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.smtpSecret" . }}
+                  key: {{ .Values.gotrue.smtp.secretKeys.adminEmail }}
+
+            - name: APP__GOTRUE__ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.secret" . }}
+                  key: {{ .Values.appflowy.gotrue.secretKeys.adminPassword }}
+
+            - name: APP__GOTRUE__JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.gotrue.jwtSecret" . }}
+                  key: {{ .Values.gotrue.jwt.secretKey }}
+
+            - name: APP__GOTRUE__EXT_URL
+              value: {{ .Values.gotrue.externalUrl }}
+
+            {{- if .Values.appflowy.s3.useMinio }}
+            - name: APP__S3__USE_MINIO
+              value: "true"
+            {{- end }}
+            - name: APP__S3__ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.accessKeyId }}
+
+            - name: APP__S3__SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.secretAccessKey }}
+
+            - name: APP__S3__REGION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.region }}
+
+            - name: APP__S3__BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.bucket }}
+
+            - name: APP__S3__MINIO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.s3.secret" . }}
+                  key: {{ .Values.appflowy.s3.secretKeys.endpoint }}
+
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+
+            - name: APP__DATABASE__REQUIRE_SSL
+              value: "true"
+
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: DATABASE_URL
+            {{- end }}
+
+            - name: APP__DATABASE__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            - name: APP__DATABASE__PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            - name: APP__DATABASE__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            - name: APP__DATABASE__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            - name: APP__DATABASE__DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
+
+            {{- if .Values.redis.enabled }}
+            - name: APP__REDIS_URI
+              value: redis://{{ template "common.names.fullname" .Subcharts.redis }}-master:6379
+            {{- end }}
+
+      {{- with .Values.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

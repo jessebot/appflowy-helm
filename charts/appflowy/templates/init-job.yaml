@@ -1,0 +1,256 @@
+{{- if .Values.initJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: appflowy-cloud-init-job
+  labels:
+    {{- include "appflowy.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-4"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "appflowy.labels" . | nindent 8 }}
+	{{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: OnFailure
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: postgresql-isready
+          image: bitnami/postgresql:16.1.0-debian-11-r15
+          command:
+            - "sh"
+            - "-c"
+            - |
+              until psql -h $PGHOST -U $PGUSER -p $PGPORT -d $PGDATABASE -c '\q'; do echo 'Postgres is still unavailable - sleeping'; sleep 2; done
+          {{- with .Values.initJob.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+            {{- end }}
+
+            # - name: POSTGRES_HOST or maybe DB_HOST
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            # - name: DB_PORT
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            # - name: POSTGRES_USER or maybe DB_USER
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            # - name: POSTGRES_PASSWORD or maybe DB_PASSWORD
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            # - name: POSTGRES_DB or maybe DB_NAME?
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
+
+        - name: clone-sql-migrations
+          image: bitnami/git:2.43.0-debian-11-r0
+          command: ["sh", "/tmp/git-clone-migrations.sh"]
+          volumeMounts:
+            - name: migrations-script
+              mountPath: "/tmp"
+            - name: sql-scripts
+              mountPath: /opt/appflowy
+          {{- with .Values.initJob.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+            {{- end }}
+
+            # - name: POSTGRES_HOST or maybe DB_HOST
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            # - name: DB_PORT
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            # - name: POSTGRES_USER or maybe DB_USER
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            # - name: POSTGRES_PASSWORD or maybe DB_PASSWORD
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            # - name: POSTGRES_DB or maybe DB_NAME?
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
+      containers:
+        - name: {{ .Chart.Name }}-init
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: bitnami/postgresql:16.1.0-debian-11-r15
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["sh", "/tmp/db-migrations.sh"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: migrations-script
+              mountPath: "/tmp"
+            - name: sql-scripts
+              mountPath: /opt/appflowy
+          {{- with .Values.initJob.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.externalDatabase.sslMode }}
+            - name: "PGSSLMODE"
+              value: {{ .Values.externalDatabase.sslMode }}
+
+            - name: "PGSSLCERT"
+              value: {{ .Values.externalDatabase.sslCert }}
+
+            - name: "PGSSLKEY"
+              value: {{ .Values.externalDatabase.sslKey }}
+
+            - name: "PGSSLROOTCERT"
+              value: {{ .Values.externalDatabase.sslRootCert }}
+            {{- end }}
+
+            # - name: POSTGRES_HOST or maybe DB_HOST
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.host" . }}
+
+            # - name: DB_PORT
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.port" . }}
+
+            # - name: POSTGRES_USER or maybe DB_USER
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.user" . }}
+
+            {{- if not .Values.externalDatabase.sslMode }}
+            # - name: POSTGRES_PASSWORD or maybe DB_PASSWORD
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.userPassword" . }}
+            {{- end }}
+
+            # - name: POSTGRES_DB or maybe DB_NAME?
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "appflowy.db.secret" . }}
+                  key: {{ include "appflowy.db.secretKey.database" . }}
+      volumes:
+        - name: migrations-script
+          configMap:
+            name: db-init
+        - name: sql-scripts
+          persistentVolumeClaim:
+            {{- if .Values.initJob.existingClaim }}
+            claimName: {{ .Values.initJob.existingClaim }}
+            {{- else }}
+            claimName: sql-migrations
+            {{- end }}
+      {{- with .Values.initJob.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }} {{/** end if .Values.initJob.enabled **/}}
