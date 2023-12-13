@@ -135,7 +135,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
-| service | object | `{"port":80,"targetPort":3000,"type":"ClusterIP"}` | service for appflowy_cloudy |
+| service | object | `{"port":80,"targetPort":8000,"type":"ClusterIP"}` | service for appflowy_cloudy |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.automount | bool | `true` | Automatically mount a ServiceAccount's API credentials? |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |

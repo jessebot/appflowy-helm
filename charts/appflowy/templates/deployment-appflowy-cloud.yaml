@@ -158,21 +158,18 @@ spec:
                   key: DATABASE_URL
             {{- end }}
 
-            # - name: PGHOST
             - name: APP__DATABASE__HOST
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.host" . }}
 
-            # - name: PGPORT
             - name: APP__DATABASE__PORT
               valueFrom:
                 secretKeyRef:
                   name: {{ include "appflowy.db.secret" . }}
                   key: {{ include "appflowy.db.secretKey.port" . }}
 
-            # - name: PGUSER
             - name: APP__DATABASE__USERNAME
               valueFrom:
                 secretKeyRef:
@@ -180,7 +177,6 @@ spec:
                   key: {{ include "appflowy.db.secretKey.user" . }}
 
             {{- if not .Values.externalDatabase.sslMode }}
-            # - name: PGPASSWORD
             - name: APP__DATABASE__PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -188,7 +184,6 @@ spec:
                   key: {{ include "appflowy.db.secretKey.userPassword" . }}
             {{- end }}
 
-            # - name: PGDATABASE
             - name: APP__DATABASE__DATABASE_NAME
               valueFrom:
                 secretKeyRef:
@@ -196,9 +191,6 @@ spec:
                   key: {{ include "appflowy.db.secretKey.database" . }}
 
             {{- if .Values.redis.enabled }}
-            - name: APP__REDIS_URI
-              value: redis://{{ template "common.names.fullname" .Subcharts.redis }}-master:6379
-
             - name: REDIS_URI
               value: redis://{{ template "common.names.fullname" .Subcharts.redis }}-master:6379
             {{- end }}
