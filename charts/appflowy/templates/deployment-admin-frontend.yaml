@@ -4,14 +4,14 @@ kind: Deployment
 metadata:
   name: {{ include "appflowy.fullname" . }}-admin-frontend
   labels:
-    {{- include "appflowy.labels" . | nindent 4 }}
+    {{- include "appflowy.adminFrontend.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "appflowy.selectorLabels" . | nindent 6 }}
+      {{- include "appflowy.adminFrontend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "appflowy.labels" . | nindent 8 }}
+        {{- include "appflowy.adminFrontend.labels" . | nindent 8 }}
 	{{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
