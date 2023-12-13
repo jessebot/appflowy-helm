@@ -34,5 +34,5 @@ dependencies:
     condition: redis.enabled
   - name: gotrue
     version: 0.5.*
-    repository: https://jessebot.github.io/gotrue-helm
+    repository: https://small-hack.github.io/gotrue-helm
     condition: gotrue.enabled

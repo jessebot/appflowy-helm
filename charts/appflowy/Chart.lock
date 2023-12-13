@@ -6,7 +6,7 @@ dependencies:
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 18.4.0
 - name: gotrue
-  repository: https://jessebot.github.io/gotrue-helm
-  version: 0.5.0
-digest: sha256:5cc15efcecafdefc02285cba42653c300d2a88af937938a4a535601b6c67eed6
-generated: "2023-12-07T10:31:02.16388+01:00"
+  repository: https://small-hack.github.io/gotrue-helm
+  version: 0.5.1
+digest: sha256:3939931eadd8f692959875a7beb1acac908b318ef5b596921703ee626963c1a1
+generated: "2023-12-13T13:41:37.262948+01:00"

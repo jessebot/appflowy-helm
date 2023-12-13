@@ -8,7 +8,7 @@ A Helm chart for deploying appflowy cloud on Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://jessebot.github.io/gotrue-helm | gotrue | 0.5.* |
+| https://small-hack.github.io/gotrue-helm | gotrue | 0.5.* |
 | oci://registry-1.docker.io/bitnamicharts | postgresql | 13.2.* |
 | oci://registry-1.docker.io/bitnamicharts | redis | 18.4.* |
 
